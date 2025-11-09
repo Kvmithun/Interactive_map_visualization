@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Geo Interface Pro — Visualize Coordinates</title>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}" />
+</head>
+<body>
+
+    <header class="app-navbar">
+        <div class="nav-brand">
+            <i data-lucide="map" class="icon-logo"></i> Geo Interface Pro
+        </div>
+        <nav class="nav-links">
+            <a href="#">Home</a>
+            <a href="{{ url_for('project_guide') }}">Docs</a>
+            <a href="{{ url_for('map_page') }}" class="btn-launch">Map Tool</a>
+            <a href="#">About</a>
+        </nav>
+    </header>
+
+    <main class="page-content">
+
+        <section class="hero-section">
+            <div class="hero-card">
+                <h1 class="hero-title">Welcome to Geo Interface Pro</h1>
+                <p class="hero-subtitle">
+                    Visualize coordinates, manage markers, and explore geospatial data easily in your browser.
+                </p>
+                <div class="hero-actions">
+                    <a href="{{ url_for('map_page') }}" class="btn btn-primary btn-cta">
+                        Launch Map Interface
+                    </a>
+                    <a href="{{ url_for('project_guide') }}" class="btn btn-secondary btn-cta">
+                        <i data-lucide="book-open"></i> View Guide
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <h2 class="section-heading">🔍 What is Geo Interface Pro?</h2>
+            <div class="about-content">
+                <p>
+                    Geo Interface Pro is a lightweight, browser-based mapping utility for entering latitude/longitude, adding and managing markers, and zooming or fitting views dynamically. Built using **Flask** and **Leaflet.js**, it’s designed for clarity, speed, and reliability. It helps you work with geographic data effortlessly.
+                </p>
+                <div class="placeholder-visual">
+
+                </div>
+            </div>
+        </section>
+
+        <section class="how-to-section">
+            <h2 class="section-heading">Quick Start Guide</h2>
+            <div class="how-to-steps">
+
+                <div class="step-card">
+                    <i data-lucide="pin" class="step-icon"></i>
+                    <h3 class="step-title">Add Location</h3>
+                    <p>Add a marker by entering latitude and longitude. The tool automatically geocodes names.</p>
+                </div>
+
+                <div class="step-card">
+                    <i data-lucide="list-checks" class="step-icon"></i>
+                    <h3 class="step-title">Manage Markers</h3>
+                    <p>Manage and clear markers easily from the sidebar using 'Clear All' or 'Fit to markers'.</p>
+                </div>
+
+                <div class="step-card">
+                    <i data-lucide="layers" class="step-icon"></i>
+                    <h3 class="step-title">Explore the Map</h3>
+                    <p>Switch map layers (OSM/Satellite) or zoom to your default position instantly using controls.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-grid">
+            <div class="footer-left">
+                &copy; 2025 Geo Interface Pro. All Rights Reserved.
+                <div class="built-with-note">Built with Flask + Leaflet.js</div>
+            </div>
+
+            <div class="footer-middle">
+                <a href="{{ url_for('project_guide') }}">Docs</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="{{ url_for('map_page') }}" class="next-page-highlight">Next ➡️</a>
+            </div>
+
+            <div class="footer-right">
+                <div id="github-link-container">
+                    Developed by: <a href="https://www.linkedin.com/in/mithun-kv-189b42309/" id="dev-link"  target="_blank">Mithun KV</a><br>
+                    GitHub Repository: <a href="https://github.com/Kvmithun" id="git-link"  target="_blank">View Source (Kvmithun)</a>
+                </div>
+                <div class="unavailable-note" style="margin-top: 5px;">GitHub link unavailable — try later or report issue.</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

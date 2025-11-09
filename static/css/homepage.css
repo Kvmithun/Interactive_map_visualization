@@ -1,0 +1,284 @@
+/* static/css/homepage.css (Homepage specific layout and styles) */
+
+/* === ROOT VARIABLES (Should ideally be in style.css, but defined here for context) === */
+:root {
+    --color-primary: #1E88E5; /* Soft Blue */
+    --color-secondary: #E0E0E0; /* Light Gray */
+    --color-background: #F0F2F5; /* Page Background */
+    --color-text-dark: #333;
+    --color-text-light: #555;
+    --radius-large: 16px;
+    --shadow-soft: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* === GENERAL PAGE STRUCTURE === */
+body {
+    background-color: var(--color-background);
+    display: block; /* Override default flex */
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.page-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 20px 50px 20px;
+}
+
+.section-heading {
+    text-align: center;
+    font-size: 2em;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin-bottom: 40px;
+    padding-top: 40px;
+}
+
+/* === NAVBAR (1️⃣) === */
+.app-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9); /* Translucent White */
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.nav-brand {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.nav-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+.nav-links a {
+    text-decoration: none;
+    color: var(--color-text-light);
+    font-weight: 500;
+    transition: color 0.2s;
+}
+.nav-links a:hover {
+    color: var(--color-primary);
+}
+
+
+/* === HERO SECTION (2️⃣) === */
+.hero-section {
+    padding: 80px 0;
+    text-align: center;
+}
+
+.hero-card {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px;
+
+    /* Frosted Glass Aesthetic */
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-soft);
+    animation: scaleIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.hero-title {
+    font-size: 2.5em;
+    font-weight: 800;
+    color: var(--color-text-dark);
+    margin-bottom: 10px;
+}
+
+.hero-subtitle {
+    font-size: 1.1em;
+    color: var(--color-text-light);
+    margin-bottom: 30px;
+}
+
+.hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+
+/* === BUTTON STYLING (Shared) === */
+.btn {
+    padding: 12px 25px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #1565C0;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(30, 136, 229, 0.3);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border-color: var(--color-secondary);
+    color: var(--color-text-dark);
+}
+.btn-secondary:hover {
+    background-color: var(--color-secondary);
+    transform: translateY(-1px);
+}
+
+
+/* === ABOUT SECTION (3️⃣) === */
+.about-section {
+    max-width: 800px;
+    margin: 50px auto 70px auto;
+}
+
+.about-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+    align-items: center;
+    line-height: 1.7;
+    color: var(--color-text-light);
+    font-size: 1em;
+}
+
+.placeholder-visual {
+    background-color: #e8eaf6;
+    border-radius: var(--radius-large);
+    min-height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-text-dark);
+    font-weight: 600;
+    border: 1px solid #d4d4d4;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+
+/* === HOW TO USE SECTION (4️⃣) === */
+.how-to-section {
+    padding: 50px 0;
+}
+
+.how-to-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.step-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+}
+
+.step-icon {
+    width: 36px;
+    height: 36px;
+    color: var(--color-primary);
+    margin-bottom: 15px;
+    stroke-width: 2.5;
+}
+
+.step-title {
+    font-size: 1.2em;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.step-card p {
+    color: var(--color-text-light);
+}
+
+
+/* === FOOTER (5️⃣) === */
+.app-footer {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 25px 40px;
+    font-size: 0.9em;
+    color: var(--color-text-light);
+}
+
+.footer-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr;
+    gap: 30px;
+    align-items: center;
+}
+
+.footer-middle a,
+.footer-right a {
+    margin-right: 15px;
+    color: var(--color-text-light);
+    text-decoration: none;
+}
+.footer-middle a:hover,
+.footer-right a:hover {
+    color: var(--color-primary);
+}
+
+.footer-right {
+    text-align: right;
+    line-height: 1.6;
+}
+
+.built-with-note, .unavailable-note {
+    font-size: 0.85em;
+    margin-top: 5px;
+    color: #9E9E9E;
+}
+
+
+/* === RESPONSIVENESS === */
+@media (max-width: 900px) {
+    .how-to-steps {
+        grid-template-columns: 1fr;
+    }
+    .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .footer-right {
+        text-align: center;
+    }
+}
+
+/* === ANIMATIONS === */
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

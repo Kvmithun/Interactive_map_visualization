@@ -1,0 +1,414 @@
+/* static/css/style.css (Matching Screenshot Design) */
+
+/* === BASE & LAYOUT === */
+html, body {
+    height: 100vh; /* Use full viewport height */
+    width: 100vw;  /* Use full viewport width */
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+    background-color: #F0F2F5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* === APP CONTAINER (The entire window) === */
+.app-container {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    width: 95%; /* Responsive width */
+    height: 95%; /* Responsive height */
+    min-height: 600px;
+    max-width: 1400px;
+    max-height: 900px;
+    overflow: hidden;
+}
+
+/* === APP HEADER === */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    border-bottom: 1px solid #F0F2F5;
+    background-color: #FFFFFF;
+    color: #333;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.app-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1E88E5;
+}
+
+.icon-logo {
+    width: 24px;
+    height: 24px;
+}
+
+/* Toggle Switch (for the header) */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+input:checked + .slider {
+  background-color: #1E88E5;
+}
+input:checked + .slider:before {
+  transform: translateX(16px);
+}
+.slider.round {
+  border-radius: 24px;
+}
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
+/* === APP MAIN CONTENT (SIDEBAR + MAP) === */
+.app-main {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* === SIDEBAR / LEFT PANEL === */
+.sidebar {
+    flex: 0 0 320px;
+    background-color: #FFFFFF;
+    padding: 25px;
+    border-right: 1px solid #F0F2F5;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.panel-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-label {
+    font-size: 0.9em;
+    color: #555;
+    font-weight: 500;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    font-size: 1em;
+    background-color: #F7F8FA;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: #1E88E5;
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+    outline: none;
+    background-color: #FFFFFF;
+}
+
+/* === BUTTON GROUP === */
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-primary, .btn-secondary, .btn-danger {
+    width: 100%;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.btn-primary {
+    background-color: #1E88E5;
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #1565C0;
+    box-shadow: 0 4px 10px rgba(30, 136, 229, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: #E0E0E0;
+    color: #555;
+}
+.btn-secondary:hover {
+    background-color: #CDCDCD;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background-color: #EF4444;
+    color: white;
+}
+.btn-danger:hover {
+    background-color: #DC2626;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+    transform: translateY(-1px);
+}
+
+
+/* === MAP PANEL (CRUCIAL FIX) === */
+.map-panel {
+    flex-grow: 1;
+    min-width: 400px; /* Ensure map has space to render */
+    border-radius: 0 16px 16px 0;
+    overflow: hidden;
+    position: relative; /* Needed for positioning custom controls */
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+/* === MARKER LIST STYLING (Enabled) === */
+.list-section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    display: block; /* Ensure visibility */
+}
+.list-header {
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #EEE;
+    font-size: 1em;
+}
+.marker-list {
+    max-height: 250px;
+    overflow-y: auto;
+}
+.sidebar .marker-item {
+    background: white;
+    border-radius: 0;
+}
+/* Adjust buttons inside list for better fit */
+.marker-item .btn-secondary {
+    padding: 4px 8px;
+    font-size: 0.8em;
+    font-weight: 500;
+}
+
+
+/* === CUSTOM MAP CONTROLS (Layers, Zoom) === */
+.custom-map-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.layers-control {
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    color: #555;
+}
+.layers-control select {
+    padding: 5px;
+    border: 1px solid #E0E0E0;
+    border-radius: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.zoom-controls {
+    display: flex;
+    flex-direction: column;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+.zoom-button {
+    width: 40px;
+    height: 40px;
+    background-color: #FFFFFF;
+    border: none;
+    color: #555;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+.zoom-button:first-child { border-bottom: 1px solid #E0E0E0; }
+.zoom-button:hover {
+    background-color: #F0F2F5;
+    color: #1E88E5;
+}
+
+/* Hide default Leaflet controls */
+.leaflet-control-zoom,
+.leaflet-control-attribution,
+.leaflet-control-layers {
+    display: none !important;
+}
+
+
+/* === TOAST & MODAL === */
+.toast {
+  visibility: hidden;
+  min-width: 280px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  padding: 12px 20px;
+  position: fixed;
+  z-index: 6000;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.5s, bottom 0.5s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.toast.show {
+  visibility: visible;
+  opacity: 1;
+  bottom: 50px;
+}
+
+.custom-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 5000;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+.custom-modal.show {
+  display: flex;
+}
+.modal-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  max-width: 450px;
+  width: 90%;
+  text-align: center;
+}
+.modal-content h4 {
+  margin-top: 0;
+  font-size: 1.4em;
+  color: #EF4444;
+  font-weight: 700;
+}
+.modal-content p {
+    color: #555;
+    line-height: 1.5;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+/* === MEDIA QUERIES === */
+@media (max-width: 900px) {
+    .app-container {
+        flex-direction: column;
+        max-height: 100%;
+        max-width: 100%;
+        border-radius: 0;
+    }
+    .app-main {
+        flex-direction: column;
+    }
+    .sidebar {
+        flex: none;
+        width: auto;
+        border-right: none;
+        border-bottom: 1px solid #F0F2F5;
+    }
+    .map-panel {
+        border-radius: 0;
+        min-height: 300px;
+    }
+    .custom-map-controls {
+        top: auto;
+        bottom: 20px;
+        right: 20px;
+        flex-direction: row;
+        gap: 15px;
+    }
+    .zoom-controls {
+        flex-direction: row;
+    }
+    .zoom-button:first-child { border-right: 1px solid #E0E0E0; border-bottom: none; }
+    .zoom-button:last-child { border-left: 1px solid #E0E0E0; border-bottom: none; }
+}

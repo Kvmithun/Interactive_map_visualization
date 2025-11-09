@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Geo Interface Pro — Project Guide</title>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* BASE STYLES for the document to ensure clean rendering */
+        body {
+            font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #F0F2F5;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .guide-container {
+            width: 100%;
+            max-width: 850px;
+            margin: 40px auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        /* PAGE STYLING (The 5 'Pages') */
+        .guide-page {
+            background-color: white;
+            padding: 40px;
+            min-height: 900px; /* Gives a distinct 'page' feel */
+            border-bottom: 2px solid #E0E0E0;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #1E88E5;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .page-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1E88E5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .page-number {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #555;
+        }
+        h3 {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #333;
+            margin-top: 30px;
+            border-bottom: 1px solid #F0F2F5;
+            padding-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #E0E0E0;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #F7F8FA;
+            font-weight: 600;
+        }
+        code {
+            background-color: #F7F8FA;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #D32F2F;
+        }
+        .code-block {
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        .highlight-blue {
+            color: #1E88E5;
+            font-weight: 600;
+        }
+        .highlight-red {
+            color: #D32F2F;
+            font-weight: 600;
+        }
+        .step-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .step-list li {
+            margin-bottom: 8px;
+        }
+
+        /* Go back button */
+        .btn-back {
+            background-color: #555;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 20px;
+            align-self: center;
+            transition: background-color 0.2s;
+        }
+        .btn-back:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <a href="{{ url_for('index') }}" class="btn-back">
+        <i data-lucide="arrow-left" style="width:16px; height:16px; margin-right: 5px; vertical-align: middle;"></i> Back to Homepage
+    </a>
+
+    <div class="guide-container">
+
+        <div class="guide-page">
+            <div class="page-header">
+                <div class="page-title"><i data-lucide="map" style="width: 24px; height: 24px;"></i> Geo Interface Pro</div>
+                <div class="page-number">Page 1 / 5</div>
+            </div>
+            <h2>Project Overview & Tech Stack</h2>
+
+            <h3>🎯 Application Goal</h3>
+            <p>Geo Interface Pro is a modern, browser-based utility designed for efficient <span class="highlight-blue">geospatial data visualization</span>. Its primary function is to provide a fast, reliable interface for users to convert and plot coordinate data (Latitude/Longitude) onto an interactive map, manage markers dynamically, and perform automated <span class="highlight-blue">Reverse Geocoding</span>.</p>
+
+            <h3>🧱 Technology Stack</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Technology</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Backend</td>
+                        <td><span class="highlight-red">Flask (Python)</span></td>
+                        <td>Lightweight web server, handles routing and serves assets/templates.</td>
+                    </tr>
+                    <tr>
+                        <td>Frontend Map</td>
+                        <td><span class="highlight-red">Leaflet.js</span></td>
+                        <td>Core JS library for rendering the interactive map, markers, and base layers.</td>
+                    </tr>
+                    <tr>
+                        <td>Geocoding</td>
+                        <td>Nominatim API (OSM)</td>
+                        <td>External service for <span class="highlight-blue">Reverse Geocoding</span> (coordinates to address).</td>
+                    </tr>
+                    <tr>
+                        <td>Client Logic</td>
+                        <td>Vanilla JavaScript (ES6+)</td>
+                        <td>Manages all front-end interactivity, AJAX calls, and custom UI elements.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="guide-page">
+            <div class="page-header">
+                <div class="page-title"><i data-lucide="settings" style="width: 24px; height: 24px;"></i> System Architecture & Workflow</div>
+                <div class="page-number">Page 2 / 5</div>
+            </div>
+            <h2>⚙️ Workflow: Request to Render</h2>
+            <p>The application follows a standard Client-Server architecture. The primary challenge is managing asynchronous network calls for geocoding without locking the user interface.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Step</th>
+                        <th>Component</th>
+                        <th>Action & Data Flow</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1. Startup</td>
+                        <td>Browser ➡️ Flask</td>
+                        <td>Flask serves <code>map.html</code> and all static assets (CSS, JS).</td>
+                    </tr>
+                    <tr>
+                        <td>2. Map Init</td>
+                        <td>Leaflet.js</td>
+                        <td>Map canvas initializes; controls (Zoom, Layers) and base layers are added.</td>
+                    </tr>
+                    <tr>
+                        <td>3. User Interaction</td>
+                        <td>Browser ➡️ <code>map.js</code></td>
+                        <td>User clicks map or clicks "Add Marker."</td>
+                    </tr>
+                    <tr>
+                        <td>4. Geocoding (Async)</td>
+                        <td><code>map.js</code> ➡️ Nominatim API</td>
+                        <td>JavaScript executes an <code>async fetch()</code> to convert coordinates to a place name.</td>
+                    </tr>
+                    <tr>
+                        <td>5. Marker Creation</td>
+                        <td><code>map.js</code> ➡️ Leaflet</td>
+                        <td>Once the name is received, the marker is rendered, and its data is saved to <span class="highlight-red">localStorage</span>.</td>
+                    </tr>
+                    <tr>
+                        <td>6. UI Feedback</td>
+                        <td><code>map.js</code></td>
+                        <td>A <span class="highlight-blue">Toast Notification</span> appears to confirm the action, replacing disruptive native alerts.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="guide-page">
+            <div class="page-header">
+                <div class="page-title"><i data-lucide="code" style="width: 24px; height: 24px;"></i> Build & Deployment</div>
+                <div class="page-number">Page 3 / 5</div>
+            </div>
+            <h2>🚀 Local Development Setup</h2>
+            <p>The application can be run locally using a standard Python environment with the Flask framework installed.</p>
+
+            <h3>📦 Installation Steps</h3>
+            <ol class="step-list">
+                <li>Install Python dependencies: <code>pip install -r requirements.txt</code></li>
+                <li>Run the Flask server: <code>python app.py</code></li>
+                <li>Access the application at: <code>http://127.0.0.1:5000/</code></li>
+            </ol>
+
+            <h3>💾 Data Persistence</h3>
+            <p>Marker data is stored entirely on the user's browser via <span class="highlight-blue"><code>localStorage</code></span>. Note that data is explicitly cleared every time the map page loads to ensure a fresh experience (controlled by <code>localStorage.removeItem(STORAGE_KEY)</code> in <code>map.js</code>).</p>
+
+            <h3>📐 Template Routing</h3>
+            <p>The Flask application uses the following routing configuration:</p>
+            <div class="code-block">
+                @app.route('/')<br>
+                def index(): return render_template('index.html')<br>
+                @app.route('/map')<br>
+                def map_page(): return render_template('map.html')<br>
+                @app.route('/guide')<br>
+                def project_guide(): return render_template('guide.html')
+            </div>
+        </div>
+
+        <div class="guide-page">
+            <div class="page-header">
+                <div class="page-title"><i data-lucide="layout-list" style="width: 24px; height: 24px;"></i> User Interface Guide</div>
+                <div class="page-number">Page 4 / 5</div>
+            </div>
+            <h2>✨ Custom UI & Marker Management</h2>
+
+            <h3>Custom UI Elements</h3>
+            <table>
+                <tr>
+                    <td><span class="highlight-blue">Toast Notification</span></td>
+                    <td>Small, non-blocking pop-up at the bottom center. Replaces <code>alert()</code> for smooth feedback.</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight-blue">Custom Modal</span></td>
+                    <td>Used for the irreversible <span class="highlight-red">Clear All Markers</span> confirmation, replacing native <code>confirm()</code>.</td>
+                </tr>
+                <tr>
+                    <td>Address Autofill</td>
+                    <td>Input field is instantly updated after map click using reverse geocoding.</td>
+                </tr>
+            </table>
+
+            <h3>📋 Marker List Details</h3>
+            <p>The sidebar's "Markers List" panel provides comprehensive controls for each location:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Detail</th>
+                        <th>Controls</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Location Name</td>
+                        <td>Displayed prominently, styled with the marker's custom color.</td>
+                    </tr>
+                    <tr>
+                        <td>Coordinates</td>
+                        <td>Displayed below the name, showing Lat/Lng up to 4 decimal places.</td>
+                    </tr>
+                    <tr>
+                        <td>Zoom Button</td>
+                        <td>Centers the map and zooms in to the specific marker's location.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight-blue">Edit/Color/Remove</span></td>
+                        <td>Clicking "Edit" opens the marker's popup, allowing the user to update the label, change the color, or delete the single marker.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="guide-page">
+            <div class="page-header">
+                <div class="page-title"><i data-lucide="zap" style="width: 24px; height: 24px;"></i> Feature & Future Scope</div>
+                <div class="page-number">Page 5 / 5</div>
+            </div>
+            <h2>💡 Future Scope & Enhancements</h2>
+            <p>While fully functional, Geo Interface Pro can be expanded with the following enhancements:</p>
+
+            <ul class="step-list">
+                <li><span class="highlight-blue">Forward Geocoding:</span> Implement a search bar that converts a typed address into coordinates, centering the map automatically.</li>
+                <li><span class="highlight-blue">Persistent Storage:</span> Integrate a lightweight database (e.g., SQLite) to save marker data across server sessions, moving beyond browser-only <code>localStorage</code>.</li>
+                <li><span class="highlight-blue">Map Icon Customization:</span> Allow users to select different SVG icon or colors for their markers.</li>
+                <li><span class="highlight-blue">Routing Integration:</span> Add the ability to select two markers and display a travel route between them using an engine like OSRM.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
