@@ -1,6 +1,5 @@
-// static/js/map.js — Enhanced Data-viz version
+// static/js/map.js — Enhanced Data-viz version (full file)
 // Implements: color/size encoding, custom clusters, heatmap toggle, time slider, filters, search, legend, bookmarking, accessibility.
-// NOTE: Optional libs: Chart.js, leaflet.heat, noUiSlider, Fuse.js — graceful degradation if absent.
 
 // -------------------- Basic globals & helpers --------------------
 const map = L.map("map", { zoomControl: false }).setView([40.7128, -74.0060], 12);
@@ -20,15 +19,11 @@ let currentBase = "osm";
 // clustering (customized)
 const markersCluster = L.markerClusterGroup({
   iconCreateFunction: (cluster) => {
-    // compute aggregated metrics for cluster
     const children = cluster.getAllChildMarkers();
-    // sum of "value" property
     const sum = children.reduce((s, c) => s + (Number(c.options._meta?.value || 0)), 0);
     const count = children.length;
-    // choose color by avg value
     const avg = count ? sum / count : 0;
     const color = getColorByValue(avg);
-    // size scales with count (bounded)
     const size = Math.min(60, 30 + Math.round(Math.log(count + 1) * 8));
     return L.divIcon({
       html: `<div class="cluster-bubble" aria-label="Cluster: ${count} items, sum ${sum}"><span>${count}</span></div>`,
@@ -55,7 +50,6 @@ if (typeof rbush !== "undefined") {
 
 // -------------------- Styling helpers --------------------
 function getColorByValue(v) {
-  // simple quantize palette (ColorBrewer-ish)
   if (v >= 1000) return "#800026";
   if (v >= 500) return "#BD0026";
   if (v >= 200) return "#E31A1C";
@@ -66,23 +60,45 @@ function getColorByValue(v) {
   return "#FFEDA0";
 }
 function getCategoryColor(cat) {
-  // categories -> color map (extend as needed)
   const map = {
     "restaurant": "#1E88E5",
     "park": "#43A047",
     "shop": "#8E24AA",
     "transit": "#F4511E",
-    "default": "#607D8B"
+    "default": "#E53935" // default: red-ish to match user expectation
   };
   return map[cat] || map.default;
 }
+
+// sizedIconForValue uses an emoji pin (📍) with color tint and numeric badge
 function sizedIconForValue(color, value, minSize = 28, maxSize = 72) {
-  // linear scale on value (clamp)
   const maxValue = 1000; // adjust to your domain
   const v = Math.min(maxValue, Math.max(0, Number(value || 0)));
   const size = Math.round(minSize + (v / maxValue) * (maxSize - minSize));
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24"><circle cx="12" cy="10" r="8" fill="${color}" stroke="#222" stroke-opacity="0.08"/><text x="12" y="15" font-size="${Math.round(size/4)}" fill="#fff" font-family="sans-serif" text-anchor="middle">${Math.round(Math.min(v,999))}</text></svg>`;
-  return L.divIcon({ html: svg, className: "custom-marker", iconSize: [size, size], iconAnchor: [size/2, size] });
+
+  const badgeSize = Math.max(10, Math.round(size * 0.35));
+  const emojiFontSize = Math.round(size * 0.6);
+
+  const safeColor = String(color || "#E53935").replace(/"/g, "");
+
+  const html = `
+    <div class="emoji-marker-wrap" style="position:relative; width:${size}px; height:${size}px; display:flex; align-items:center; justify-content:center; transform:translateY(-10%);">
+      <div style="position:absolute; width:${size}px; height:${size}px; border-radius:50%; background:${safeColor}; opacity:0.12; top:0; left:0; filter: blur(${Math.max(0, Math.round(size*0.06))}px)"></div>
+      <div style="font-size:${emojiFontSize}px; line-height:1; transform:translateY(-6%);">
+        📍
+      </div>
+      <div style="position:absolute; right:-6px; bottom:-6px; min-width:${badgeSize}px; height:${badgeSize}px; padding:2px ${Math.max(4, Math.round(badgeSize/3))}px; border-radius:${badgeSize}px; background:${safeColor}; color:#fff; display:flex; align-items:center; justify-content:center; font-size:${Math.max(10, Math.round(badgeSize*0.6))}px; box-shadow:0 1px 2px rgba(0,0,0,0.2);">
+        ${Math.round(Math.min(v,999))}
+      </div>
+    </div>
+  `;
+
+  return L.divIcon({
+    html,
+    className: "custom-emoji-marker",
+    iconSize: [size, size],
+    iconAnchor: [Math.round(size/2), size]
+  });
 }
 
 // html-escaping
@@ -92,7 +108,6 @@ function escapeHtml(s) {
 
 // -------------------- Create / update markers --------------------
 function createMapMarker(obj, addToStore = true) {
-  // normalize
   const o = {
     id: String(obj.id || uid()),
     lat: Number(obj.lat),
@@ -106,7 +121,6 @@ function createMapMarker(obj, addToStore = true) {
   };
 
   const icon = sizedIconForValue(o.color, o.value);
-  // attach meta properties to marker options for cluster aggregation
   const marker = L.marker([o.lat, o.lng], { icon, title: o.label, keyboard: true, _meta: { id: o.id, value: o.value, category: o.category } });
   marker.meta = { id: o.id, color: o.color };
   marker.bindTooltip(escapeHtml(o.label || "(no label)"), { direction: "top", offset: [0,-8], permanent: false });
@@ -114,11 +128,9 @@ function createMapMarker(obj, addToStore = true) {
 
   marker.on("popupopen", (e) => {
     attachPopupHandlers(e.popup, o.id);
-    // draw mini charts if Chart.js is available
     if (typeof Chart !== "undefined") {
       const ctx = document.getElementById(`popup-chart-${o.id}`);
       if (ctx && ctx.getContext) {
-        // (example) generate sparkline from extra.timeseries or random placeholder
         const ts = o.extra.timeseries || generateSampleSeries();
         new Chart(ctx, { type: 'line', data: { labels: ts.map((_,i)=>i), datasets:[{ data: ts, fill: false, borderWidth: 1, pointRadius: 0 }] }, options: { responsive: false, plugins: { legend: { display: false }}, scales:{ x:{ display:false }, y:{ display:false } } } });
       }
@@ -141,22 +153,19 @@ function updateMarkerOnMap(obj) {
   let found = null;
   markersCluster.eachLayer(l => { if (l.meta && String(l.meta.id) === sid) found = l; });
   if (!found) return;
-  // update stored object
   const store = markers.find(m => String(m.id) === sid);
   if (store) {
     Object.assign(store, { label: obj.label || store.label, color: obj.color || store.color, value: Number(obj.value || store.value), category: obj.category || store.category, timestamp: Number(obj.timestamp || store.timestamp) });
     saveToStorage();
     indexUpdate(store);
   }
-  // update icon and popup
-  found.setIcon(sizedIconForValue(obj.color || found.meta.color || "#1E88E5", obj.value));
+  found.setIcon(sizedIconForValue(obj.color || found.meta.color || "#E53935", obj.value));
   found.setPopupContent(popupContent(obj));
   found.meta.color = obj.color;
 }
 
 // -------------------- Popup content & handlers --------------------
 function popupContent(obj) {
-  // include a small canvas placeholder for Chart.js
   return `
     <div style="font-size:14px">
       <strong>${escapeHtml(obj.label || "(no label)")}</strong>
@@ -165,6 +174,10 @@ function popupContent(obj) {
       <div style="margin-top:6px;display:flex;gap:6px">
         <input id="popup-value-${obj.id}" type="number" value="${escapeHtml(String(obj.value||0))}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px" />
         <input id="popup-cat-${obj.id}" value="${escapeHtml(obj.category || "")}" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px" />
+      </div>
+      <div style="margin-top:6px;display:flex;gap:6px;align-items:center">
+        <label style="font-size:12px">Color</label>
+        <input id="popup-color-${obj.id}" type="color" value="${escapeHtml(obj.color || '#E53935')}" style="width:44px;height:32px;border-radius:6px;border:1px solid #ddd;padding:2px" />
       </div>
       <div style="margin-top:8px;"><canvas id="popup-chart-${obj.id}" width="200" height="60" aria-label="mini chart for ${escapeHtml(obj.label)}"></canvas></div>
       <div style="display:flex;gap:8px;margin-top:8px">
@@ -182,6 +195,7 @@ function attachPopupHandlers(popup, id) {
   const labelInput = document.getElementById(`popup-label-${sid}`);
   const valueInput = document.getElementById(`popup-value-${sid}`);
   const catInput = document.getElementById(`popup-cat-${sid}`);
+  const colorInput = document.getElementById(`popup-color-${sid}`);
   if (!saveBtn) return;
 
   saveBtn.onclick = () => {
@@ -190,7 +204,7 @@ function attachPopupHandlers(popup, id) {
     m.label = labelInput.value;
     m.value = Number(valueInput.value || 0);
     m.category = catInput.value || m.category;
-    m.color = getCategoryColor(m.category) || m.color;
+    m.color = (colorInput && colorInput.value) ? colorInput.value : getCategoryColor(m.category) || m.color;
     updateMarkerOnMap(m);
     try { popup._close(); } catch(e) {}
     redrawList();
@@ -207,11 +221,9 @@ function attachPopupHandlers(popup, id) {
 // -------------------- Removal, storage, index --------------------
 function removeMarkerById(id) {
   const sid = String(id);
-  // remove layer
   let toRemove = null;
   markersCluster.eachLayer(l => { if (l.meta && String(l.meta.id) === sid) toRemove = l; });
   if (toRemove) markersCluster.removeLayer(toRemove);
-  // remove from array
   markers = markers.filter(m => String(m.id) !== sid);
   saveToStorage();
   indexRemove(sid);
@@ -231,7 +243,6 @@ function loadFromStorage() {
   } catch(e) { console.error("Load failed", e); return []; }
 }
 
-// simple spatial index wrappers (optional)
 function indexInsert(o) { if (spatialIndex) spatialIndex.insert({ minX:o.lng, minY:o.lat, maxX:o.lng, maxY:o.lat, id: o.id }); }
 function indexRemove(id) { if (spatialIndex) { const items = spatialIndex.all().filter(x => x.id === id); items.forEach(i=> spatialIndex.remove(i)); } }
 function indexUpdate(o) { indexRemove(o.id); indexInsert(o); }
@@ -249,7 +260,6 @@ function redrawList() {
   }
   if (listSection) listSection.style.display = 'block';
 
-  // show summary & top N
   const sorted = markers.slice().sort((a,b)=>b.value-a.value).slice(0,50);
   sorted.forEach(m => {
     const el = document.createElement("div");
@@ -273,7 +283,6 @@ function redrawList() {
     list.appendChild(el);
   });
 
-  // attach events
   list.querySelectorAll(".btn-zoom").forEach(b => {
     b.onclick = (e) => {
       const id = e.currentTarget.getAttribute("data-id");
@@ -307,7 +316,6 @@ function redrawList() {
 // -------------------- Heat, Hexbin, Choropleth toggles --------------------
 function toggleHeat(enabled) {
   if (enabled) {
-    // lazy create if plugin available
     if (typeof L.heatLayer === "undefined") { showToast("Heatmap plugin missing."); return; }
     const heatPoints = markers.map(m => [m.lat, m.lng, Math.max(0.5, Math.log10((m.value||1)+1))]);
     heatLayer = L.heatLayer(heatPoints, { radius: 25, blur: 20, maxZoom: 17 }).addTo(map);
@@ -319,10 +327,9 @@ function toggleHeat(enabled) {
 // -------------------- Filters, Time slider & search --------------------
 let currentFilters = { category: null, minValue: null, maxValue: null, timeRange: null, query: "" };
 
-// apply filters: rebuild cluster layer (efficient approach: clear and add visible markers)
 function applyFilters() {
-  // debounce-friendly wrapper
   window.requestAnimationFrame(() => {
+    // Clear cluster and re-add visible markers (we recreate temporary marker layers from stored marker objects)
     markersCluster.clearLayers();
     const visible = markers.filter(m => {
       if (currentFilters.category && String(m.category) !== String(currentFilters.category)) return false;
@@ -330,14 +337,11 @@ function applyFilters() {
       if (currentFilters.maxValue != null && m.value > currentFilters.maxValue) return false;
       if (currentFilters.timeRange && (m.timestamp < currentFilters.timeRange[0] || m.timestamp > currentFilters.timeRange[1])) return false;
       if (currentFilters.query && currentFilters.query.trim().length > 0) {
-        // if Fuse available, use it (but we pre-filtered markers outside)
         if (typeof Fuse !== "undefined") {
-          // Fuse instance expected to be set as window.fuse
           if (window.fuse) {
             const r = window.fuse.search(currentFilters.query).map(x=>x.item.id);
             return r.includes(m.id);
           } else {
-            // fallback simple substring
             return (m.label||"").toLowerCase().includes(currentFilters.query.toLowerCase());
           }
         } else {
@@ -346,7 +350,6 @@ function applyFilters() {
       }
       return true;
     });
-    // re-add visible markers (createMapMarker with addToStore=false to avoid duplicating storage)
     visible.forEach(v => createMapMarker(v, false));
     redrawList();
   });
@@ -357,12 +360,10 @@ function initTimeSlider(minTs, maxTs) {
   const sliderEl = document.getElementById("timeSlider");
   if (!sliderEl) return;
   if (typeof noUiSlider === "undefined") {
-    // fallback: two inputs
     const minInput = document.getElementById("timeMin");
     const maxInput = document.getElementById("timeMax");
     if (minInput) minInput.value = new Date(minTs).toISOString().slice(0,10);
     if (maxInput) maxInput.value = new Date(maxTs).toISOString().slice(0,10);
-    // attach change events to update currentFilters.timeRange then applyFilters
     [minInput, maxInput].forEach(inp => { if (inp) inp.onchange = () => {
       const a = new Date(minInput.value).getTime();
       const b = new Date(maxInput.value).getTime();
@@ -373,9 +374,8 @@ function initTimeSlider(minTs, maxTs) {
   }
   noUiSlider.create(sliderEl, { start:[minTs, maxTs], connect:true, range:{ min: minTs, max: maxTs }, tooltips:[true,true], format:{ to: v => new Date(+v).toLocaleDateString(), from: v => Date.parse(v) } });
   sliderEl.noUiSlider.on("update", function(values, handle) {
-    const raw = sliderEl.noUiSlider.get(true); // numeric values
+    const raw = sliderEl.noUiSlider.get(true);
     currentFilters.timeRange = [Math.min(raw[0], raw[1]), Math.max(raw[0], raw[1])];
-    // throttle applying filters
     debounce(applyFilters, 150)();
   });
 }
@@ -445,7 +445,6 @@ function initFromSaved() {
   }
   markers = saved.slice();
   markers.forEach(m => createMapMarker(m, false));
-  // init heat if toggled (read from UI)
   const heatToggle = document.getElementById("toggleHeat");
   if (heatToggle && heatToggle.checked) toggleHeat(true);
   redrawList();
@@ -458,24 +457,37 @@ map.on("click", async (e) => {
   document.getElementById("lat").value = lat.toFixed(6);
   document.getElementById("lng").value = lng.toFixed(6);
   document.getElementById("label").value = label;
-  const obj = { id: uid(), lat, lng, label, color: getCategoryColor("default"), category: "default", value: 1, timestamp: Date.now() };
+  const colorInput = document.getElementById("markerColor");
+  const selectedColor = (colorInput && colorInput.value) ? colorInput.value : getCategoryColor("default");
+  const obj = { id: uid(), lat, lng, label, color: selectedColor, category: "default", value: 1, timestamp: Date.now() };
   createMapMarker(obj, true);
   showToast(`Marker added: ${label}`);
 });
 
-const addBtn = document.getElementById("btn-add");
-if (addBtn) addBtn.onclick = async () => {
-  const lat = Number(document.getElementById("lat").value);
-  const lng = Number(document.getElementById("lng").value);
-  let label = document.getElementById("label").value || (await getPlaceName(lat,lng));
-  const category = document.getElementById("category")?.value || "default";
-  const value = Number(document.getElementById("value")?.value || 1);
-  if (!isFinite(lat) || !isFinite(lng)) { showToast("Enter valid coordinates"); return; }
-  const obj = { id: uid(), lat, lng, label, color: getCategoryColor(category), category, value, timestamp: Date.now() };
-  createMapMarker(obj, true);
-  map.setView([lat,lng], 14);
-  showToast(`Marker added: ${label}`);
-};
+// Add button handler (reads color input)
+(function wireAddButton() {
+  const addBtn = document.getElementById("btn-add");
+  if (!addBtn) return;
+  addBtn.onclick = async () => {
+    const latEl = document.getElementById("lat");
+    const lngEl = document.getElementById("lng");
+    const labelEl = document.getElementById("label");
+    const catEl = document.getElementById("category");
+    const valEl = document.getElementById("value");
+    const lat = Number(latEl?.value);
+    const lng = Number(lngEl?.value);
+    let label = labelEl?.value || (await getPlaceName(lat,lng));
+    const category = catEl?.value || "default";
+    const value = Number(valEl?.value || 1);
+    const colorInput = document.getElementById("markerColor");
+    const selectedColor = (colorInput && colorInput.value) ? colorInput.value : getCategoryColor(category);
+    if (!isFinite(lat) || !isFinite(lng)) { showToast("Enter valid coordinates"); return; }
+    const obj = { id: uid(), lat, lng, label, color: selectedColor, category, value, timestamp: Date.now() };
+    createMapMarker(obj, true);
+    map.setView([lat,lng], 14);
+    showToast(`Marker added: ${label}`);
+  };
+})();
 
 document.getElementById("btn-center")?.addEventListener("click", () => {
   if (!markers.length) { showToast("No markers to fit."); return; }
@@ -494,7 +506,6 @@ document.getElementById("btn-clear-all")?.addEventListener("click", () => {
 
 // -------------------- UI wiring for toggles, filters, legend, search, share --------------------
 function wireUI() {
-  // basemap selector
   const basemapSelect = document.getElementById("basemapSelect");
   basemapSelect?.addEventListener("change", (e) => {
     const v = e.target.value;
@@ -503,32 +514,26 @@ function wireUI() {
     baseLayers[v].addTo(map); currentBase = v; showToast(`Basemap: ${v}`);
   });
 
-  // heat toggle
   const heatToggle = document.getElementById("toggleHeat");
   heatToggle?.addEventListener("change", (e) => toggleHeat(e.target.checked));
 
-  // filter controls (category/value)
   const catFilter = document.getElementById("filterCategory");
   catFilter?.addEventListener("change", (e) => { currentFilters.category = e.target.value || null; applyFilters(); });
   const minVal = document.getElementById("filterMinValue");
   minVal?.addEventListener("input", debounce((e) => { currentFilters.minValue = e.target.value ? Number(e.target.value) : null; applyFilters(); }, 200));
 
-  // search
   initSearch();
 
-  // time slider: determine min/max from dataset
   const now = Date.now();
   const minTs = markers.reduce((s,m)=>Math.min(s,m.timestamp||now), now);
   const maxTs = markers.reduce((s,m)=>Math.max(s,m.timestamp||now), now);
   initTimeSlider(minTs, maxTs);
 
-  // share/bookmark button
   document.getElementById("btn-share")?.addEventListener("click", () => {
     const url = getMapStateUrl();
     navigator.clipboard?.writeText(url).then(()=> showToast("Link copied to clipboard"), ()=> { showToast("Failed to copy. Here: "+url); });
   });
 
-  // legend build
   buildLegend();
 }
 
@@ -552,11 +557,9 @@ function buildLegend() {
 
 // -------------------- Heatmap & aggregation toggles (hexbin/choropleth placeholders) --------------------
 function showHexbin() {
-  // This is a placeholder — implement with d3-hexbin/turf to compute hex polygons and render GeoJSON
   showToast("Hexbin layer requires d3-hexbin implementation (not included).");
 }
 function showChoropleth(geojson) {
-  // Accepts GeoJSON with aggregated property 'value' per feature
   const choropleth = L.geoJSON(geojson, { style: f => ({ fillColor: getColorByValue(f.properties.value), fillOpacity:0.7, color:'#fff', weight:0.5 }) }).addTo(map);
   return choropleth;
 }
@@ -564,15 +567,80 @@ function showChoropleth(geojson) {
 // -------------------- Small utilities --------------------
 function generateSampleSeries(len=20) { const a=[]; for(let i=0;i<len;i++) a.push(Math.round(Math.random()*50)); return a; }
 
-// -------------------- Init run on DOM load --------------------
+// -------------------- DOMContentLoaded: wire UI, create search & color if missing, load saved --------------------
 document.addEventListener("DOMContentLoaded", () => {
-  // wire controls
   wireUI();
-  // load saved and rehydrate
+
+  // create dynamic UI pieces if the HTML doesn't already include them:
+  (function ensureSearchAndColorInputs() {
+    const labelEl = document.getElementById("label");
+    if (!labelEl) return;
+
+    const parent = labelEl.parentElement || document.body;
+
+    // create Search button under label (only if not present)
+    if (!document.getElementById("btn-search")) {
+      const searchBtn = document.createElement("button");
+      searchBtn.id = "btn-search";
+      searchBtn.type = "button";
+      searchBtn.innerText = "Search";
+      searchBtn.style.marginTop = "8px";
+      searchBtn.style.padding = "8px 10px";
+      searchBtn.style.borderRadius = "6px";
+      searchBtn.style.background = "#10B981";
+      searchBtn.style.color = "#fff";
+      searchBtn.style.border = "none";
+      searchBtn.style.cursor = "pointer";
+      parent.appendChild(searchBtn);
+
+      searchBtn.onclick = async () => {
+        const q = (labelEl.value || "").trim();
+        if (!q) { showToast("Enter address or place name to search."); return; }
+        const found = markers.find(m => (m.label||"").toLowerCase() === q.toLowerCase()) || markers.find(m => (m.label||"").toLowerCase().includes(q.toLowerCase()));
+        if (found) {
+          map.setView([found.lat, found.lng], 15);
+          let foundLayer = null;
+          markersCluster.eachLayer(l => { if (l.meta && String(l.meta.id) === String(found.id)) foundLayer = l; });
+          if (foundLayer) foundLayer.openPopup();
+          showToast("Found existing marker & zoomed to it.");
+          return;
+        }
+        try {
+          const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(q)}&limit=1`;
+          const res = await fetch(url, { headers: { 'User-Agent': 'GeoInterfacePro/1.0 (contact@example.com)' }});
+          if (!res.ok) throw new Error("Geocode failed");
+          const arr = await res.json();
+          if (!arr || arr.length === 0) { showToast("No results found."); return; }
+          const r = arr[0];
+          const lat = parseFloat(r.lat), lng = parseFloat(r.lon);
+          document.getElementById("lat").value = lat.toFixed(6);
+          document.getElementById("lng").value = lng.toFixed(6);
+          labelEl.value = r.display_name || q;
+          map.setView([lat, lng], 14);
+          showToast("Location found — coordinates filled. Press 'Add' to create marker.");
+        } catch (e) {
+          console.error(e);
+          showToast("Search failed.");
+        }
+      };
+    }
+
+    // create color input if not present
+    if (!document.getElementById("markerColor")) {
+      const colorInput = document.createElement("input");
+      colorInput.type = "color";
+      colorInput.id = "markerColor";
+      colorInput.value = "#E53935"; // default red
+      colorInput.title = "Marker color";
+      colorInput.style.marginLeft = "8px";
+      const ref = document.getElementById("category") || labelEl;
+      ref.parentElement?.appendChild(colorInput);
+    }
+  })();
+
   initFromSaved();
-  // restore url state
   restoreMapStateFromUrl();
-  // initial placeholder values
+
   document.getElementById("lat") && (document.getElementById("lat").value = "40.7128");
   document.getElementById("lng") && (document.getElementById("lng").value = "-74.0060");
   document.getElementById("label") && (document.getElementById("label").value = "New York, NY");
@@ -580,7 +648,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // -------------------- Search helper (Fuse) --------------------
-// Optionally you can call buildFuse() whenever data changes to refresh index
 function buildFuse() {
   if (typeof Fuse === "undefined") return;
   window.fuse = new Fuse(markers, { keys: ["label", "category"], threshold: 0.4 });
